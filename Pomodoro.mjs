@@ -19,6 +19,7 @@ export default class Pomodoro {
   _running = false;
   _status = Config.initialStatus;
   _prevStatus = Config.initialStatus;
+  _duration = Config.durations[Config.initialStatus];
   _remaining = Config.durations[Config.initialStatus];
   _cycleCount = 0;
   _onStateChange = () => {};
@@ -53,6 +54,7 @@ export default class Pomodoro {
           break;
       }
 
+      this._duration = Config.durations[this._status];
       this._remaining = Config.durations[this._status];
     }
 
@@ -64,6 +66,7 @@ export default class Pomodoro {
       running: this._running,
       status: this._status,
       prevStatus: this._prevStatus,
+      duration: this._duration,
       remaining: this._remaining,
       cycleCount: this._cycleCount,
     };

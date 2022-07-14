@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width"
+    />
+    <meta name="theme-color" />
+    <title>Smooth Tomato</title>
+    <link rel="icon" href="./assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="./assets/icon-256.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+  </head>
+  <body>
+    <div id="root">
+      <div class="indicators">
+        <div id="progress-ring"></div>
+        <div id="progress-ring-background"></div>
+        <div class="indicators-inner">
+          <div id="remaining"></div>
+          <button id="play-pause-button"><img /></button>
+        </div>
+      </div>
+      <div class="tomatos">
+        <i></i>
+        <i></i>
+        <i></i>
+        <i></i>
+      </div>
+      <div class="statuses">
+        <span class="status" id="focus-label">focus</span>
+        <span class="status" id="shot-break-label">shot break</span>
+        <span class="status" id="long-break-label">long break</span>
+      </div>
+        <button class="status" id="reset-button">reset</button>
+      </div>
+    </div>
+    <script src="./main.mjs" type="module"></script>
+  </body>
+</html>
