@@ -8,9 +8,9 @@ const Config = {
   cyclesBeforeLongBreak: 4,
   initialStatus: Status.FOCUS,
   durations: {
-    [Status.FOCUS]: 5,
-    [Status.SHORT_BREAK]: 2,
-    [Status.LONG_BREAK]: 4,
+    [Status.FOCUS]: 25 * 60,
+    [Status.SHORT_BREAK]: 5 * 60,
+    [Status.LONG_BREAK]: 15 * 60,
   },
 };
 

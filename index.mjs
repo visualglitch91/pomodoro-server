@@ -19,19 +19,18 @@ const pomodoro = new Pomodoro({
 
 const serveClient = serveStatic("client");
 
+const pomodoroMethods = ["start", "stop", "skip", "reset"];
+
+function callPomodoroMethod(method) {
+  console.log({ method });
+  if (pomodoroMethods.includes(method)) {
+    pomodoro[method]();
+  }
+}
+
 const server = http.createServer((req, res) => {
   if (req.url.startsWith("/api/")) {
-    const handler = {
-      start: () => pomodoro.start(),
-      stop: () => pomodoro.stop(),
-      skip: () => pomodoro.skip(),
-      reset: () => pomodoro.reset(),
-      state: () => {},
-    }[req.url.slice(5)];
-
-    if (handler) {
-      handler();
-    }
+    callPomodoroMethod(req.url.slice(5));
 
     res.setHeader("Content-Type", "application/json");
     res.writeHead(200);
@@ -50,6 +49,10 @@ const wss = new WebSocketServer({ server });
 
 wss.on("connection", (client) => {
   client.send(JSON.stringify(pomodoro.getState()));
+
+  client.on("message", (data) => {
+    callPomodoroMethod(data.toString());
+  });
 });
 
 server.listen(port, () => {

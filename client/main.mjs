@@ -50,21 +50,6 @@ function render(state) {
 
 const isSecure = window.location.protocol === "https:";
 
-function api(path) {
-  return fetch(
-    `${window.location.protocol}//${window.location.host}/api/${path}`
-  );
-}
-
-function onToggleRunning() {
-  api(isRunning ? "stop" : "start");
-}
-
-function onReset() {
-  api("reset");
-  playPauseButton.focus();
-}
-
 const ws = new WebSocket(
   `${isSecure ? "wss" : "ws"}://${window.location.host}`
 );
@@ -74,6 +59,15 @@ ws.addEventListener("message", (e) => {
   isRunning = state.running;
   render(state);
 });
+
+function onToggleRunning() {
+  ws.send(isRunning ? "stop" : "start");
+}
+
+function onReset() {
+  ws.send("reset");
+  playPauseButton.focus();
+}
 
 onSpacebar(onToggleRunning);
 resetButton.addEventListener("click", onReset);
