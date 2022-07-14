@@ -50,25 +50,35 @@ function render(state) {
 
 const isSecure = window.location.protocol === "https:";
 
-const ws = new WebSocket(
-  `${isSecure ? "wss" : "ws"}://${window.location.host}`
-);
+let ws;
 
-ws.addEventListener("message", (e) => {
-  const state = JSON.parse(e.data);
-  isRunning = state.running;
-  render(state);
-});
+function connect() {
+  function retry() {
+    setTimeout(connect, 1000);
+  }
+
+  ws = new WebSocket(`${isSecure ? "wss" : "ws"}://${window.location.host}`);
+
+  ws.addEventListener("message", (e) => {
+    const state = JSON.parse(e.data);
+    isRunning = state.running;
+    render(state);
+  });
+
+  ws.addEventListener("close", retry);
+  ws.addEventListener("error", retry);
+}
 
 function onToggleRunning() {
-  ws.send(isRunning ? "stop" : "start");
+  ws?.send(isRunning ? "stop" : "start");
 }
 
 function onReset() {
-  ws.send("reset");
+  ws?.send("reset");
   playPauseButton.focus();
 }
 
 onSpacebar(onToggleRunning);
 resetButton.addEventListener("click", onReset);
 playPauseButton.addEventListener("click", onToggleRunning);
+connect();
