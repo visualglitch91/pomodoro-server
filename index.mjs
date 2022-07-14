@@ -2,12 +2,14 @@ import http from "http";
 import serveStatic from "serve-static";
 import WebSocket, { WebSocketServer } from "ws";
 import Pomodoro from "./Pomodoro.mjs";
+import hooks from "./hooks.mjs";
 
 const port = 2000;
 
 const pomodoro = new Pomodoro({
   onStateChange: (state) => {
-    wss.clients.forEach(function each(client) {
+    hooks(state);
+    wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(state));
       }

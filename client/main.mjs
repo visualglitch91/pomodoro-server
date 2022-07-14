@@ -48,8 +48,12 @@ function render(state) {
   progressRing.setProgress(((duration - state.remaining) / duration) * 100);
 }
 
+const isSecure = window.location.protocol === "https:";
+
 function api(path) {
-  return fetch(`http://${window.location.host}/api/${path}`);
+  return fetch(
+    `${window.location.protocol}//${window.location.host}/api/${path}`
+  );
 }
 
 function onToggleRunning() {
@@ -61,7 +65,9 @@ function onReset() {
   playPauseButton.focus();
 }
 
-const ws = new WebSocket(`ws://${window.location.host}`);
+const ws = new WebSocket(
+  `${isSecure ? "wss" : "ws"}://${window.location.host}`
+);
 
 ws.addEventListener("message", (e) => {
   const state = JSON.parse(e.data);
