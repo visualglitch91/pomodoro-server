@@ -4,94 +4,98 @@ const Status = {
   LONG_BREAK: "long-break",
 };
 
-const totalCycle = 4;
-
-const durations = {
-  [Status.FOCUS]: 5,
-  [Status.SHORT_BREAK]: 2,
-  [Status.LONG_BREAK]: 4,
+const Config = {
+  cyclesBeforeLongBreak: 4,
+  initialStatus: Status.FOCUS,
+  durations: {
+    [Status.FOCUS]: 5,
+    [Status.SHORT_BREAK]: 2,
+    [Status.LONG_BREAK]: 4,
+  },
 };
 
-const initialStatus = Status.FOCUS;
+export default class Pomodoro {
+  _interval = 0;
+  _running = false;
+  _status = Config.initialStatus;
+  _prevStatus = Config.initialStatus;
+  _remaining = Config.durations[Config.initialStatus];
+  _cycleCount = 0;
+  _onStateChange = () => {};
 
-const initialState = {
-  running: false,
-  remaining: durations[initialStatus],
-  prevStatus: initialStatus,
-  status: initialStatus,
-  cycleCount: 0,
-};
-
-export default function Pomodoro({ onStateChange }) {
-  let interval = 0;
-  let state = { ...initialState };
-
-  function setState(nextState) {
-    state = nextState;
-    onStateChange(state);
+  constructor({ onStateChange }) {
+    this._onStateChange = onStateChange;
   }
 
-  function getState() {
-    return state;
+  _emitStateChange() {
+    this._onStateChange(this.getState());
   }
 
-  function tick() {
-    const nextState = { ...state, remaining: state.remaining - 1 };
+  _tick() {
+    this._remaining -= 1;
+    this._prevStatus = this._status;
 
-    if (nextState.remaining < 0) {
-      switch (nextState.status) {
+    if (this._remaining < 0) {
+      switch (this._status) {
         case Status.FOCUS:
-          nextState.status =
-            nextState.cycleCount >= totalCycle - 1
+          this._status =
+            this._cycleCount >= Config.cyclesBeforeLongBreak - 1
               ? Status.LONG_BREAK
               : Status.SHORT_BREAK;
           break;
         case Status.LONG_BREAK:
-          nextState.status = Status.FOCUS;
-          nextState.cycleCount = 0;
+          this._status = Status.FOCUS;
+          this._cycleCount = 0;
           break;
         case Status.SHORT_BREAK:
-          nextState.status = Status.FOCUS;
-          nextState.cycleCount++;
+          this._status = Status.FOCUS;
+          this._cycleCount++;
           break;
       }
 
-      nextState.remaining = durations[nextState.status];
+      this._remaining = Config.durations[this._status];
     }
 
-    nextState.prevStatus = state.status;
-    setState(nextState);
+    this._emitStateChange();
   }
 
-  function start() {
-    if (!state.running) {
-      clearInterval(interval);
-      interval = setInterval(tick, 1000);
-      setState({ ...state, running: true });
+  getState() {
+    return {
+      running: this._running,
+      status: this._status,
+      prevStatus: this._prevStatus,
+      remaining: this._remaining,
+      cycleCount: this._cycleCount,
+    };
+  }
+
+  start() {
+    if (!this._running) {
+      clearInterval(this._interval);
+      this._running = true;
+      this._interval = setInterval(() => this._tick(), 1000);
+      this._emitStateChange();
     }
   }
 
-  function stop() {
-    if (state.running) {
-      clearInterval(interval);
-      setState({ ...state, running: false });
+  stop() {
+    if (this._running) {
+      clearInterval(this._interval);
+      this._running = false;
+      this._emitStateChange();
     }
   }
 
-  function skip() {
-    state = { ...state, remaining: 0 };
-    tick();
+  skip() {
+    this._remaining = 0;
+    this._tick();
   }
 
-  function reset() {
-    setState({ ...initialState });
+  reset() {
+    this._remaining = Config.durations[Config.initialStatus];
+    this._prevStatus = Config.initialStatus;
+    this._status = Config.initialStatus;
+    this._cycleCount = 0;
+    this._emitStateChange();
   }
-
-  return {
-    start,
-    stop,
-    skip,
-    reset,
-    getState,
-  };
 }
