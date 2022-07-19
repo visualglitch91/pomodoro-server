@@ -18,7 +18,7 @@ export default class Pomodoro {
   _interval = 0;
   _running = false;
   _status = Config.initialStatus;
-  _prevStatus = Config.initialStatus;
+  _prevStatus = null;
   _duration = Config.durations[Config.initialStatus];
   _remaining = Config.durations[Config.initialStatus];
   _cycleCount = 0;
@@ -95,10 +95,15 @@ export default class Pomodoro {
   }
 
   reset() {
-    this._remaining = Config.durations[Config.initialStatus];
-    this._prevStatus = Config.initialStatus;
+    clearInterval(this._interval);
+
+    this._running = false;
     this._status = Config.initialStatus;
+    this._prevStatus = null;
+    this._duration = Config.durations[Config.initialStatus];
+    this._remaining = Config.durations[Config.initialStatus];
     this._cycleCount = 0;
+
     this._emitStateChange();
   }
 }

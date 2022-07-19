@@ -22,7 +22,6 @@ const serveClient = serveStatic("client");
 const pomodoroMethods = ["start", "stop", "skip", "reset"];
 
 function callPomodoroMethod(method) {
-  console.log({ method });
   if (pomodoroMethods.includes(method)) {
     pomodoro[method]();
   }
