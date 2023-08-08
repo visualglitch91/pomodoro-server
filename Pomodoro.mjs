@@ -89,7 +89,12 @@ export default class Pomodoro {
     }
   }
 
-  skip() {
+  prev() {
+    this._remaining = this._duration;
+    this._emitStateChange();
+  }
+
+  next() {
     this._remaining = 0;
     this._tick();
   }

@@ -9,6 +9,8 @@ const themeColors = {
 
 const pauseIcon = "./assets/pause-icon.svg";
 const playIcon = "./assets/play-icon.svg";
+const prevIcon = "./assets/prev-icon.svg";
+const nextIcon = "./assets/next-icon.svg";
 
 const tomatos = $(".tomatos");
 const remaining = $("#remaining");
@@ -18,9 +20,14 @@ const shotBreakLabel = $("#shot-break-label");
 const longBreakLabel = $("#long-break-label");
 const resetButton = $("#reset-button");
 const playPauseButton = $("#play-pause-button");
+const prevButton = $("#prev-button");
+const nextButton = $("#next-button");
 const progressRing = createProgressRing($("#progress-ring"), 4, 130, 0);
 
 let isRunning = false;
+
+prevButton.firstChild.src = prevIcon;
+nextButton.firstChild.src = nextIcon;
 
 function render(state) {
   const { status, duration } = state;
@@ -43,7 +50,11 @@ function render(state) {
     tomato.classList.toggle("active", index === state.cycleCount);
   });
 
-  playPauseButton.firstChild.src = state.running ? pauseIcon : playIcon;
+  const nextPlayPauseIcon = state.running ? pauseIcon : playIcon;
+
+  if (playPauseButton.firstChild.getAttribute("src") !== nextPlayPauseIcon) {
+    playPauseButton.firstChild.src = nextPlayPauseIcon;
+  }
 
   progressRing.setProgress(((duration - state.remaining) / duration) * 100);
 }
@@ -78,7 +89,19 @@ function onReset() {
   playPauseButton.focus();
 }
 
+function onPrev() {
+  ws?.send("prev");
+  playPauseButton.focus();
+}
+
+function onNext() {
+  ws?.send("next");
+  playPauseButton.focus();
+}
+
 onSpacebar(onToggleRunning);
 resetButton.addEventListener("click", onReset);
 playPauseButton.addEventListener("click", onToggleRunning);
+prevButton.addEventListener("click", onPrev);
+nextButton.addEventListener("click", onNext);
 connect();
